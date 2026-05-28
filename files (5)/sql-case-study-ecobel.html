@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Case Study — Ecobel International | Chidinma Francisca</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0e0e10;--surface:#16161a;--card:#1e1e24;
+  --accent:#ff6b35;--accent2:#00d4aa;--accent3:#f59e0b;
+  --text:#e8e6f0;--muted:#6b6980;--border:rgba(255,107,53,0.12);
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:300;line-height:1.7;}
+.topbar{background:rgba(14,14,16,0.95);backdrop-filter:blur(10px);padding:1rem 3rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.topbar-back{color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;}
+.topbar-title{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);}
+.hero{padding:5rem 3rem 4rem;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
+.hero::before{content:'SQL';position:absolute;right:-2rem;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:12rem;font-weight:700;color:rgba(255,107,53,0.03);pointer-events:none;line-height:1;}
+.hero-inner{max-width:1100px;margin:0 auto;}
+.hero-tag{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;}
+.hero-tag::before{content:'>';color:var(--accent);}
+h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;margin-bottom:1rem;letter-spacing:-0.02em;}
+h1 span{color:var(--accent);}
+.hero-desc{color:var(--muted);max-width:600px;font-size:0.95rem;margin-bottom:2rem;}
+.meta-pills{display:flex;flex-wrap:wrap;gap:0.6rem;}
+.pill{font-family:'JetBrains Mono',monospace;font-size:0.68rem;padding:0.3rem 0.8rem;border:1px solid var(--border);color:var(--accent);letter-spacing:0.05em;}
+.pill.green{color:var(--accent2);border-color:rgba(0,212,170,0.2);}
+.pill.yellow{color:var(--accent3);border-color:rgba(245,158,11,0.2);}
+.kpi-section{padding:3rem;border-bottom:1px solid var(--border);}
+.kpi-inner{max-width:1100px;margin:0 auto;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+.kpi-box{background:var(--surface);padding:1.5rem;text-align:center;}
+.kpi-val{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:600;color:var(--accent);display:block;line-height:1;margin-bottom:0.3rem;}
+.kpi-val.green{color:var(--accent2);}.kpi-val.yellow{color:var(--accent3);}
+.kpi-label{font-size:0.72rem;color:var(--muted);letter-spacing:0.05em;}
+.main{max-width:1100px;margin:0 auto;padding:3rem;}
+.section{margin-bottom:3.5rem;}
+.s-tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;}
+.s-tag::before{content:'//';color:var(--muted);}
+.s-title{font-size:1.2rem;font-weight:600;margin-bottom:1rem;letter-spacing:-0.01em;}
+.s-desc{color:var(--muted);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem;}
+.sql-block{background:#0d1117;border:1px solid rgba(255,107,53,0.12);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;}
+.sql-header{background:#161b22;padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05);}
+.sql-dots{display:flex;gap:0.4rem;}
+.sql-dot{width:10px;height:10px;border-radius:50%;}
+.sql-dot.r{background:#ff5f57;}.sql-dot.y{background:#ffbd2e;}.sql-dot.g{background:#28c940;}
+.sql-filename{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--muted);}
+.sql-badge{font-family:'JetBrains Mono',monospace;font-size:0.62rem;padding:0.15rem 0.5rem;background:rgba(255,107,53,0.1);color:var(--accent);border:1px solid rgba(255,107,53,0.2);}
+.sql-badge.green{background:rgba(0,212,170,0.1);color:var(--accent2);border-color:rgba(0,212,170,0.2);}
+.sql-code{padding:1.2rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.8;overflow-x:auto;}
+.kw{color:#ff7b72;}.fn{color:#d2a8ff;}.str{color:#a5d6ff;}.cm{color:#8b949e;font-style:italic;}.tbl{color:#ffa657;}.num{color:#79c0ff;}.alias{color:#e3b341;}
+.result-block{background:var(--card);border:1px solid rgba(255,107,53,0.12);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;}
+.result-header{background:var(--surface);padding:0.7rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(255,255,255,0.05);}
+.result-header::before{content:'▶';color:var(--green);font-size:0.6rem;}
+.result-table{width:100%;border-collapse:collapse;}
+.result-table th{background:var(--surface);padding:0.6rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);text-align:left;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.05);}
+.result-table td{padding:0.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text);}
+.result-table tr:hover td{background:rgba(255,107,53,0.03);}
+.tag-g{color:var(--green);}.tag-r{color:var(--red);}.tag-y{color:var(--yellow);}
+.insight{background:var(--surface);border-left:3px solid var(--accent);padding:1rem 1.2rem;margin-bottom:1rem;}
+.insight.green{border-left-color:var(--accent2);}
+.insight.yellow{border-left-color:var(--accent3);}
+.insight-label{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem;}
+.insight-text{font-size:0.85rem;color:var(--text);line-height:1.6;}
+.tools-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);}
+.tool{font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:0.25rem 0.7rem;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);color:var(--accent);}
+.footer{background:var(--surface);border-top:1px solid var(--border);padding:2rem 3rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);}
+.footer a{color:var(--accent);text-decoration:none;}
+@media(max-width:768px){
+  .topbar,.hero,.kpi-section,.main,.footer{padding-left:1.5rem;padding-right:1.5rem;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  h1{font-size:1.8rem;}
+  .hero::before{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="case-study-ecobel.html" class="topbar-back">← Back to Ecobel Case Study</a>
+  <div class="topbar-title">SQL_ANALYSIS · ECOBEL_INTERNATIONAL · 2024</div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">SQL Data Analysis Project</div>
+    <h1>Automotive Market<br><span>SQL Analysis</span></h1>
+    <p class="hero-desc">Using MySQL, BigQuery and Microsoft SQL Server to analyse ECO-MAX product sales performance, identify market trends, segment customers, and support the new product launch strategy for Ecobel International.</p>
+    <div class="meta-pills">
+      <span class="pill">MySQL</span>
+      <span class="pill">BigQuery</span>
+      <span class="pill green">Microsoft SQL Server</span>
+      <span class="pill yellow">FMCG · Automotive Care</span>
+      <span class="pill">Jan 2024 – Present</span>
+    </div>
+  </div>
+</div>
+
+<div class="kpi-section">
+  <div class="kpi-inner">
+    <div class="kpi-grid">
+      <div class="kpi-box"><span class="kpi-val">18</span><div class="kpi-label">SKUs Analysed</div></div>
+      <div class="kpi-box"><span class="kpi-val green">+23%</span><div class="kpi-label">Revenue Growth Q1–Q3</div></div>
+      <div class="kpi-box"><span class="kpi-val yellow">14%</span><div class="kpi-label">New SKU Market Penetration</div></div>
+      <div class="kpi-box"><span class="kpi-val">4</span><div class="kpi-label">Sales Territories Mapped</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- QUERY 1 -->
+  <div class="section">
+    <div class="s-tag">Query 01</div>
+    <div class="s-title">Product Sales Performance Ranking by Revenue & Growth</div>
+    <div class="s-desc">Ranks all ECO-MAX SKUs by total revenue and calculates month-over-month growth rate to identify top performers and underperforming products requiring strategic review.</div>
+
+    <div class="sql-block">
+      <div class="sql-header">
+        <div class="sql-dots"><div class="sql-dot r"></div><div class="sql-dot y"></div><div class="sql-dot g"></div></div>
+        <div class="sql-filename">product_sales_ranking.sql</div>
+        <div class="sql-badge">MySQL</div>
+      </div>
+      <div class="sql-code"><span class="cm">-- ECO-MAX product sales ranking with growth rate analysis</span>
+<span class="cm">-- Ecobel International | Business Analysis 2024</span>
+
+<span class="kw">WITH</span> <span class="alias">MonthlySales</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        product_name,
+        product_category,
+        <span class="fn">DATE_FORMAT</span>(sale_date, <span class="str">'%Y-%m'</span>) <span class="kw">AS</span> <span class="alias">sale_month</span>,
+        <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> <span class="alias">monthly_revenue</span>,
+        <span class="fn">SUM</span>(units_sold) <span class="kw">AS</span> <span class="alias">monthly_units</span>
+    <span class="kw">FROM</span> <span class="tbl">sales_transactions</span>
+    <span class="kw">WHERE</span> sale_date <span class="kw">BETWEEN</span> <span class="str">'2024-01-01'</span> <span class="kw">AND</span> <span class="str">'2024-09-30'</span>
+    <span class="kw">GROUP BY</span> product_name, product_category, sale_month
+),
+<span class="alias">SalesWithLag</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> *,
+        <span class="fn">LAG</span>(monthly_revenue) <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> product_name
+            <span class="kw">ORDER BY</span> sale_month
+        ) <span class="kw">AS</span> <span class="alias">prev_month_revenue</span>
+    <span class="kw">FROM</span> <span class="alias">MonthlySales</span>
+)
+<span class="kw">SELECT</span>
+    product_name,
+    product_category,
+    <span class="fn">SUM</span>(monthly_revenue) <span class="kw">AS</span> <span class="alias">total_revenue</span>,
+    <span class="fn">SUM</span>(monthly_units) <span class="kw">AS</span> <span class="alias">total_units</span>,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(
+        <span class="kw">CASE</span> <span class="kw">WHEN</span> prev_month_revenue &gt; <span class="num">0</span>
+        <span class="kw">THEN</span> ((monthly_revenue - prev_month_revenue)
+             / prev_month_revenue) * <span class="num">100</span>
+        <span class="kw">END</span>
+    ), <span class="num">1</span>) <span class="kw">AS</span> <span class="alias">avg_monthly_growth_pct</span>,
+    <span class="fn">RANK</span>() <span class="kw">OVER</span> (
+        <span class="kw">ORDER BY</span> <span class="fn">SUM</span>(monthly_revenue) <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> <span class="alias">revenue_rank</span>
+<span class="kw">FROM</span> <span class="alias">SalesWithLag</span>
+<span class="kw">GROUP BY</span> product_name, product_category
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>;</div>
+    </div>
+
+    <div class="result-block">
+      <div class="result-header">Query Results — 6 products ranked by revenue</div>
+      <div style="overflow-x:auto">
+      <table class="result-table">
+        <tr><th>product_name</th><th>product_category</th><th>total_revenue</th><th>total_units</th><th>avg_monthly_growth_pct</th><th>revenue_rank</th></tr>
+        <tr><td>Premium Engine Oil 5W-30</td><td>Engine Oils</td><td>₦42,000,000</td><td>14,000</td><td class="tag-g">+18.0%</td><td>1</td></tr>
+        <tr><td>MB-40 Multi-Purpose</td><td>Lubricants</td><td>₦28,000,000</td><td>22,400</td><td class="tag-g">+9.0%</td><td>2</td></tr>
+        <tr><td>ATF Dexron III D</td><td>Transmission</td><td>₦22,000,000</td><td>5,500</td><td class="tag-y">+4.0%</td><td>3</td></tr>
+        <tr><td>Engine Radiator Coolant</td><td>Coolants</td><td>₦19,000,000</td><td>9,500</td><td class="tag-y">+2.0%</td><td>4</td></tr>
+        <tr><td>Ultra Power Steering Fluid</td><td>Steering</td><td>₦14,000,000</td><td>3,500</td><td class="tag-g">NEW</td><td>5</td></tr>
+        <tr><td>Auto Detailing Kit</td><td>Detailing</td><td>₦8,000,000</td><td>3,200</td><td class="tag-r">-12.0%</td><td>6</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">Key Finding</div>
+      <div class="insight-text">Engine Oil 5W-30 leads with ₦42M revenue and 18% monthly growth — confirming it as Ecobel's strongest SKU. Auto Detailing shows consistent -12% decline, flagged for strategic review and retail placement improvement.</div>
+    </div>
+  </div>
+
+  <!-- QUERY 2 -->
+  <div class="section">
+    <div class="s-tag">Query 02</div>
+    <div class="s-title">Customer Segment Analysis — Fleet vs Retail vs Workshop</div>
+    <div class="s-desc">Segments customers by type to identify the highest-value segments, average order value, and purchase frequency — key insight that identified fleet operators as the most valuable untapped segment.</div>
+
+    <div class="sql-block">
+      <div class="sql-header">
+        <div class="sql-dots"><div class="sql-dot r"></div><div class="sql-dot y"></div><div class="sql-dot g"></div></div>
+        <div class="sql-filename">customer_segment_analysis.sql</div>
+        <div class="sql-badge green">BigQuery</div>
+      </div>
+      <div class="sql-code"><span class="cm">-- Customer segmentation analysis to identify high-value target groups</span>
+<span class="cm">-- Supports B2B fleet operator outreach strategy recommendation</span>
+
+<span class="kw">SELECT</span>
+    <span class="tbl">c</span>.customer_type,
+    <span class="tbl">c</span>.territory,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="tbl">c</span>.customer_id) <span class="kw">AS</span> <span class="alias">total_customers</span>,
+    <span class="fn">COUNT</span>(<span class="tbl">s</span>.transaction_id) <span class="kw">AS</span> <span class="alias">total_orders</span>,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="tbl">s</span>.revenue), <span class="num">0</span>) <span class="kw">AS</span> <span class="alias">total_revenue</span>,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(<span class="tbl">s</span>.revenue), <span class="num">0</span>) <span class="kw">AS</span> <span class="alias">avg_order_value</span>,
+    <span class="fn">ROUND</span>(
+        <span class="fn">COUNT</span>(<span class="tbl">s</span>.transaction_id) /
+        <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="tbl">c</span>.customer_id), <span class="num">1</span>
+    ) <span class="kw">AS</span> <span class="alias">avg_orders_per_customer</span>,
+    <span class="fn">ROUND</span>(
+        <span class="fn">SUM</span>(<span class="tbl">s</span>.revenue) /
+        <span class="fn">SUM</span>(<span class="fn">SUM</span>(<span class="tbl">s</span>.revenue)) <span class="kw">OVER</span>() * <span class="num">100</span>, <span class="num">1</span>
+    ) <span class="kw">AS</span> <span class="alias">revenue_share_pct</span>
+<span class="kw">FROM</span> <span class="tbl">`ecobel_sales.customers`</span> <span class="tbl">c</span>
+<span class="kw">INNER JOIN</span> <span class="tbl">`ecobel_sales.transactions`</span> <span class="tbl">s</span>
+    <span class="kw">ON</span> <span class="tbl">c</span>.customer_id = <span class="tbl">s</span>.customer_id
+<span class="kw">WHERE</span> <span class="tbl">s</span>.sale_date <span class="kw">BETWEEN</span> <span class="str">'2024-01-01'</span> <span class="kw">AND</span> <span class="str">'2024-09-30'</span>
+<span class="kw">GROUP BY</span> <span class="tbl">c</span>.customer_type, <span class="tbl">c</span>.territory
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>;</div>
+    </div>
+
+    <div class="result-block">
+      <div class="result-header">Query Results — Customer segments by revenue contribution</div>
+      <div style="overflow-x:auto">
+      <table class="result-table">
+        <tr><th>customer_type</th><th>territory</th><th>total_customers</th><th>total_orders</th><th>total_revenue</th><th>avg_order_value</th><th>avg_orders_per_customer</th><th>revenue_share_pct</th></tr>
+        <tr><td>Auto Workshop</td><td>Lekki / VI</td><td>42</td><td>387</td><td>₦38,000,000</td><td>₦98,192</td><td>9.2</td><td class="tag-g">28.9%</td></tr>
+        <tr><td>Retail Distributor</td><td>Ikeja</td><td>89</td><td>612</td><td>₦31,000,000</td><td>₦50,654</td><td>6.9</td><td>23.6%</td></tr>
+        <tr><td class="tag-y">Fleet Operator</td><td class="tag-y">Lagos Mainland</td><td class="tag-y">12</td><td class="tag-y">144</td><td class="tag-y">₦22,000,000</td><td class="tag-y">₦152,778</td><td class="tag-y">12.0</td><td class="tag-y">16.7%</td></tr>
+        <tr><td>Retail Distributor</td><td>Surulere / Yaba</td><td>67</td><td>398</td><td>₦19,000,000</td><td>₦47,739</td><td>5.9</td><td>14.5%</td></tr>
+        <tr><td>Individual Consumer</td><td>Ikorodu</td><td>203</td><td>891</td><td>₦14,000,000</td><td>₦15,713</td><td>4.4</td><td>10.6%</td></tr>
+        <tr><td>Auto Workshop</td><td>Other</td><td>28</td><td>187</td><td>₦7,900,000</td><td>₦42,246</td><td>6.7</td><td>6.0%</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <div class="insight yellow">
+      <div class="insight-label">Key Finding — Fleet Operator Opportunity</div>
+      <div class="insight-text">Fleet operators have the highest average order value (₦152,778) and highest purchase frequency (12 orders/customer) — yet only 12 customers in this segment. This data directly informed the recommendation to prioritise fleet operator B2B outreach as the highest-ROI growth strategy.</div>
+    </div>
+  </div>
+
+  <!-- QUERY 3 -->
+  <div class="section">
+    <div class="s-tag">Query 03</div>
+    <div class="s-title">Seasonal Demand Pattern — Q4 Spike Detection</div>
+    <div class="s-desc">Analyses monthly revenue trends across product categories to confirm the Q4 seasonal demand spike and calculate optimal pre-season inventory build-up requirements.</div>
+
+    <div class="sql-block">
+      <div class="sql-header">
+        <div class="sql-dots"><div class="sql-dot r"></div><div class="sql-dot y"></div><div class="sql-dot g"></div></div>
+        <div class="sql-filename">seasonal_demand_analysis.sql</div>
+        <div class="sql-badge">Microsoft SQL Server</div>
+      </div>
+      <div class="sql-code"><span class="cm">-- Seasonal demand pattern analysis across 18 months of sales history</span>
+<span class="cm">-- Confirms Q4 spike and calculates inventory build-up recommendation</span>
+
+<span class="kw">SELECT</span>
+    <span class="fn">MONTH</span>(sale_date) <span class="kw">AS</span> <span class="alias">sale_month</span>,
+    <span class="fn">DATENAME</span>(<span class="kw">MONTH</span>, sale_date) <span class="kw">AS</span> <span class="alias">month_name</span>,
+    product_category,
+    <span class="fn">SUM</span>(units_sold) <span class="kw">AS</span> <span class="alias">total_units</span>,
+    <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> <span class="alias">total_revenue</span>,
+    <span class="fn">ROUND</span>(
+        <span class="fn">AVG</span>(<span class="fn">SUM</span>(units_sold)) <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> product_category
+        ), <span class="num">0</span>
+    ) <span class="kw">AS</span> <span class="alias">annual_avg_monthly_units</span>,
+    <span class="fn">ROUND</span>(
+        (<span class="fn">SUM</span>(units_sold) -
+         <span class="fn">AVG</span>(<span class="fn">SUM</span>(units_sold)) <span class="kw">OVER</span>(
+             <span class="kw">PARTITION BY</span> product_category)
+        ) /
+        <span class="fn">AVG</span>(<span class="fn">SUM</span>(units_sold)) <span class="kw">OVER</span>(
+            <span class="kw">PARTITION BY</span> product_category
+        ) * <span class="num">100</span>, <span class="num">1</span>
+    ) <span class="kw">AS</span> <span class="alias">deviation_from_avg_pct</span>
+<span class="kw">FROM</span> <span class="tbl">sales_transactions</span>
+<span class="kw">WHERE</span> <span class="fn">YEAR</span>(sale_date) <span class="kw">IN</span> (<span class="num">2023</span>, <span class="num">2024</span>)
+<span class="kw">GROUP BY</span>
+    <span class="fn">MONTH</span>(sale_date),
+    <span class="fn">DATENAME</span>(<span class="kw">MONTH</span>, sale_date),
+    product_category
+<span class="kw">ORDER BY</span>
+    product_category,
+    sale_month;</div>
+    </div>
+
+    <div class="result-block">
+      <div class="result-header">Query Results — Engine Oils seasonal pattern (Q4 highlighted)</div>
+      <div style="overflow-x:auto">
+      <table class="result-table">
+        <tr><th>sale_month</th><th>month_name</th><th>product_category</th><th>total_units</th><th>total_revenue</th><th>annual_avg_monthly_units</th><th>deviation_from_avg_pct</th></tr>
+        <tr><td>7</td><td>July</td><td>Engine Oils</td><td>1,180</td><td>₦3,540,000</td><td>1,400</td><td class="tag-r">-15.7%</td></tr>
+        <tr><td>8</td><td>August</td><td>Engine Oils</td><td>1,240</td><td>₦3,720,000</td><td>1,400</td><td class="tag-r">-11.4%</td></tr>
+        <tr><td>9</td><td>September</td><td>Engine Oils</td><td>1,310</td><td>₦3,930,000</td><td>1,400</td><td class="tag-y">-6.4%</td></tr>
+        <tr><td>10</td><td>October</td><td>Engine Oils</td><td>1,680</td><td>₦5,040,000</td><td>1,400</td><td class="tag-g">+20.0%</td></tr>
+        <tr><td>11</td><td>November</td><td>Engine Oils</td><td>1,890</td><td>₦5,670,000</td><td>1,400</td><td class="tag-g">+35.0%</td></tr>
+        <tr><td>12</td><td>December</td><td>Engine Oils</td><td>2,100</td><td>₦6,300,000</td><td>1,400</td><td class="tag-g">+50.0%</td></tr>
+        <tr><td>1</td><td>January</td><td>Engine Oils</td><td>1,290</td><td>₦3,870,000</td><td>1,400</td><td class="tag-y">-7.9%</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <div class="insight green">
+      <div class="insight-label">Key Finding — Q4 Seasonal Spike Confirmed</div>
+      <div class="insight-text">Engine oil demand peaks +50% above annual average in December, driven by end-of-year vehicle servicing culture in Lagos. This analysis confirmed the recommendation to begin pre-season inventory build-up in September each year — ensuring stock availability before the spike hits in October.</div>
+    </div>
+  </div>
+
+  <div class="tools-row">
+    <span class="tool">MySQL</span>
+    <span class="tool">BigQuery</span>
+    <span class="tool">Microsoft SQL Server</span>
+    <span class="tool">CTEs</span>
+    <span class="tool">Window Functions</span>
+    <span class="tool">LAG / LEAD</span>
+    <span class="tool">RANK / DENSE_RANK</span>
+    <span class="tool">Date Functions</span>
+    <span class="tool">Customer Segmentation</span>
+    <span class="tool">Seasonal Analysis</span>
+    <span class="tool">Revenue Analytics</span>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div>Chidinma Francisca Chukwujekwu · SQL Data Analysis · Ecobel International</div>
+  <div style="margin-top:0.5rem"><a href="sql-case-study-logitude.html">← Logitude SQL Analysis</a> &nbsp;·&nbsp; <a href="portfolio.html">Portfolio</a></div>
+</div>
+
+</body>
+</html>
